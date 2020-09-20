@@ -1,6 +1,6 @@
 <template>
   <div class="subtask-list">
-    <div class="subtask-list__showcase"><img src="https://via.placeholder.com/150" alt="logo"></div>
+    <div class="subtask-list__showcase"><slot v-if="$slots.banner" name="banner"></slot></div>
     <div class="subtask-list__body"><slot></slot></div>
   </div>
 </template>
