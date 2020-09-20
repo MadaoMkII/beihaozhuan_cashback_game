@@ -32,7 +32,8 @@
               <div class="screenshot-upload__item__screenshot__upload">
                 <screenshot-upload
                   :disabled="task.status_mission_try === '未审核' || task.status_mission_try === '审核通过'"
-                  v-model="screenshot"/>
+                  v-model="screenshot"
+                />
               </div>
             </div>
           </div>
@@ -52,7 +53,7 @@
           </template>
         </div>
       </div>
-      <div v-if="task.subsequent_A && task.subsequent_A.available" class="card">
+      <div v-if="task.subsequent_A && task.subsequent_A.available" class="card" :class="{ 'card--disabled': !task.complete_mission_try }">
         <div class="card__title">后续奖励任务A</div>
         <div class="card__description">{{ task.subsequent_A.subsequentDescription }}</div>
         <div class="screenshot-upload">
@@ -64,16 +65,30 @@
             <div class="screenshot-upload__item__title">我的截图</div>
             <div class="screenshot-upload__item__screenshot">
               <div class="screenshot-upload__item__screenshot__upload">
-                <screenshot-upload v-model="screenshotA"/>
+                <screenshot-upload
+                  :disabled="task.status_mission_A === '未审核' || task.status_mission_A === '审核通过'"
+                  v-model="screenshotA"
+                />
               </div>
             </div>
           </div>
         </div>
         <div class="card__opt">
-          <big-gradient-button @click="submit('A', screenshotA)">提交审核</big-gradient-button>
+          <template v-if="task.status_mission_A === '未提交'">
+            <big-gradient-button @click="submit('A', screenshotA)">提交审核</big-gradient-button>
+          </template>
+          <template v-else-if="task.status_mission_A === '未审核'">
+            <big-gradient-button disabled>审核中</big-gradient-button>
+          </template>
+          <template v-else-if="task.status_mission_A === '审核未通过'">
+            <big-gradient-button @click="submit('A', screenshotA)">审核未通过，请重新上传</big-gradient-button>
+          </template>
+          <template v-else-if="task.status_mission_A === '审核通过'">
+            <big-gradient-button disabled>审核通过，奖励已发放</big-gradient-button>
+          </template>
         </div>
       </div>
-      <div v-if="task.subsequent_B && task.subsequent_B.available" class="card">
+      <div v-if="task.subsequent_B && task.subsequent_B.available" class="card" :class="{ 'card--disabled': !task.complete_mission_try }">
         <div class="card__title">后续奖励任务B</div>
         <div class="card__description">{{ task.subsequent_B.subsequentDescription }}</div>
         <div class="screenshot-upload">
@@ -85,13 +100,27 @@
             <div class="screenshot-upload__item__title">我的截图</div>
             <div class="screenshot-upload__item__screenshot">
               <div class="screenshot-upload__item__screenshot__upload">
-                <screenshot-upload v-model="screenshotB"/>
+                <screenshot-upload
+                  :disabled="task.status_mission_B === '未审核' || task.status_mission_B === '审核通过'"
+                  v-model="screenshotB"
+                />
               </div>
             </div>
           </div>
         </div>
         <div class="card__opt">
-          <big-gradient-button @click="submit('B', screenshotB)">提交审核</big-gradient-button>
+          <template v-if="task.status_mission_B === '未提交'">
+            <big-gradient-button @click="submit('B', screenshotB)">提交审核</big-gradient-button>
+          </template>
+          <template v-else-if="task.status_mission_B === '未审核'">
+            <big-gradient-button disabled>审核中</big-gradient-button>
+          </template>
+          <template v-else-if="task.status_mission_B === '审核未通过'">
+            <big-gradient-button @click="submit('B', screenshotB)">审核未通过，请重新上传</big-gradient-button>
+          </template>
+          <template v-else-if="task.status_mission_B === '审核通过'">
+            <big-gradient-button disabled>审核通过，奖励已发放</big-gradient-button>
+          </template>
         </div>
       </div>
     </div>
@@ -133,6 +162,36 @@ export default {
           break;
         case '审核通过':
           this.screenshot = this.task.screenshotUrl_mission_try;
+          break;
+        default:
+          break;
+      }
+      switch (this.task.status_mission_A) {
+        case '未提交':
+          this.screenshotA = '';
+          break;
+        case '未审核':
+          this.screenshotA = this.task.screenshotUrl_mission_A;
+          break;
+        case '审核未通过':
+          break;
+        case '审核通过':
+          this.screenshotA = this.task.screenshotUrl_mission_A;
+          break;
+        default:
+          break;
+      }
+      switch (this.task.status_mission_B) {
+        case '未提交':
+          this.screenshotB = '';
+          break;
+        case '未审核':
+          this.screenshotB = this.task.screenshotUrl_mission_B;
+          break;
+        case '审核未通过':
+          break;
+        case '审核通过':
+          this.screenshotB = this.task.screenshotUrl_mission_B;
           break;
         default:
           break;
@@ -232,6 +291,7 @@ export default {
 }
 
 .card {
+  position: relative;
   padding: 24px;
   background-color: #282A37;
   border-radius: 8px;
@@ -262,6 +322,18 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  &--disabled {
+    opacity: 0.5;
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
   }
 }
 
