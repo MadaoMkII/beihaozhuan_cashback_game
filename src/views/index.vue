@@ -49,7 +49,7 @@
           </template>
           <template v-if="data.gameEvent[i].stepSetting.status === '进行中'" #extend>
             <task-list>
-              <template v-if="data.gameEvent[i].stepSetting.videoTutorialUrl !== ''" #opt><link-button @click="showWatchVideo(data.gameEvent[i].stepSetting.videoTutorialUrl, data.gameEvent[i].category)">视频教程</link-button></template>
+              <template v-if="data.gameEvent[i].stepSetting.videoTutorialUrl !== ''" #opt><link-button @click="showWatchVideo(data.gameEvent[i].stepSetting.videoTutorialUrl, data.gameEvent[i].category, false)">视频教程</link-button></template>
               <task-list-item v-for="game in data.gameEvent[i].gameSetting" :key="game.uuid">
                 <template #title><span :class="{ 'disabled': game.complete_mission_try && game.complete_mission_A && game.complete_mission_B }">{{ game.gameName }}</span></template>
                 <template v-if="game.complete_mission_try && game.complete_mission_A && game.complete_mission_B" #opt>
@@ -117,6 +117,7 @@ export default {
       showVideo: false,
       videoURL: 'https://www.w3schools.com/html/mov_bbb.mp4',
       videoCoin: 0,
+      platform: this.getMobileOperatingSystem(),
     };
   },
   async created() {
@@ -125,6 +126,21 @@ export default {
   methods: {
     async getAllData() {
       const response = await this.$axios.get('/api/gameEvent/getRenderData');
+      for (let i = 0; i < response.data.data.gameEvent.length; i += 1) {
+        if (i !== 0) {
+          const list = [];
+          for (let j = 0; j < response.data.data.gameEvent[i].gameSetting.length; j += 1) {
+            if (this.platform !== '通用') {
+              if (response.data.data.gameEvent[i].gameSetting[j].platform === this.platform || response.data.data.gameEvent[i].gameSetting[j].platform === '通用') {
+                list.push(response.data.data.gameEvent[i].gameSetting[j]);
+              }
+            } else {
+              list.push(response.data.data.gameEvent[i].gameSetting[j]);
+            }
+          }
+          response.data.data.gameEvent[i].gameSetting = list;
+        }
+      }
       // response.data.data.gameEvent[0].stepSetting.complete_mission_watchVideo = false;
       // response.data.data.gameEvent[0].stepSetting.status = '已完成';
       // response.data.data.gameEvent[1].stepSetting.status = '未开始';
@@ -176,17 +192,33 @@ export default {
         this.isLoading = false;
       }
     },
-    async showWatchVideo(url, step) {
+    async showWatchVideo(url, step, is = true) {
       this.videoURL = url;
       this.showVideo = true;
       if (step === 'STEP1') {
         this.videoCoin = 0;
       }
-      await this.completeVideo(step);
+      if (is) {
+        await this.completeVideo(step);
+      }
     },
     onVideoClose() {
       if (this.videoCoin === 0) return;
       alert(`视频教程观看完成，${this.videoCoin}金币奖励已到账`);
+    },
+    getMobileOperatingSystem() {
+      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+      if (/android/i.test(userAgent)) {
+        return '安卓';
+      }
+
+      // iOS detection from: http://stackoverflow.com/a/9039885/177710
+      if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+        return 'IOS';
+      }
+
+      return '通用';
     },
     test($event) {
       console.log('test', $event);
