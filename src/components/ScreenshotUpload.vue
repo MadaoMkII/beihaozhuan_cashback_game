@@ -164,9 +164,9 @@ export default {
     },
     onChange(e) {
       const file = e.target.files[0];
-      const isLt2M = file.size / 1024 / 1024 < 2;
+      const isLt2M = file.size / 1024 / 1024 < 20;
       if (!isLt2M) {
-        alert('上传头像图片大小不能超过 2MB!');
+        alert('上传头像图片大小不能超过 20MB!');
         return;
       }
       this.readAsDataURL(e.target);

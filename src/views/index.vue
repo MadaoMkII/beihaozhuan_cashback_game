@@ -1,6 +1,6 @@
 <template>
   <div v-if="data" class="index">
-    <activity-header/>
+    <activity-header :value="data.getThisMonthIncoming.totalAmount"/>
     <activity-rules/>
     <step-list>
       <step-list-item :order="1">
@@ -18,11 +18,12 @@
           <tutorial-list>
             <tutorial-list-item value="0.2">
               <template #title>注册贝好赚用户送</template>
-              <template #opt><gradient-button>去完成</gradient-button></template>
+              <template v-if="!isRegistered" #opt><gradient-button>去完成</gradient-button></template>
+              <template v-else #opt><outline-button disabled>已完成</outline-button></template>
             </tutorial-list-item>
             <tutorial-list-item :value="data.gameEvent[0].stepSetting.firstWatchEarning / 10000 + ''">
               <template #title>阅读新手教程视频</template>
-              <template v-if="!data.gameEvent[0].stepSetting.complete_mission_watchVideo" #opt><gradient-button @click="completeVideo('STEP1')">去完成</gradient-button></template>
+              <template v-if="!data.gameEvent[0].stepSetting.complete_mission_watchVideo" #opt><gradient-button @click="showWatchVideo(data.gameEvent[0].stepSetting.videoTutorialUrl,'STEP1')">去完成</gradient-button></template>
               <template v-else #opt><outline-button disabled>已完成</outline-button></template>
             </tutorial-list-item>
             <tutorial-list-item :value="data.gameEvent[0].gameSetting[0].demoReward / 10000 + ''">
@@ -37,7 +38,7 @@
         <step-list-item v-if="data.gameEvent[i]" :key="i" :order="i + 1" :disabled="data.gameEvent[i].stepSetting.status === '未开始' && data.gameEvent[i - 1].stepSetting.status !== '已完成'">
           <template #content>{{ data.gameEvent[i].stepSetting.description_short }}</template>
           <template v-if="data.gameEvent[i].stepSetting.status === '未开始'" #opt>
-            <outline-button v-if="data.gameEvent[i - 1].stepSetting.status === '已完成'" @click="openTask(data.gameEvent[i].category)">开启任务</outline-button>
+            <outline-button v-if="data.gameEvent[i - 1].stepSetting.status === '已完成'" @click="openTask(data.gameEvent[i].stepSetting.videoTutorialUrl, data.gameEvent[i].category, data.gameEvent[i].stepSetting.firstWatchEarning)">开启任务</outline-button>
             <income v-else :value="data.gameEvent[i].stepSetting.expectEarning / 10000 + ''"/>
           </template>
           <template v-else-if="data.gameEvent[i].stepSetting.status === '进行中'" #opt>
@@ -48,7 +49,7 @@
           </template>
           <template v-if="data.gameEvent[i].stepSetting.status === '进行中'" #extend>
             <task-list>
-              <template #opt><link-button>视频教程</link-button></template>
+              <template v-if="data.gameEvent[i].stepSetting.videoTutorialUrl !== ''" #opt><link-button @click="showWatchVideo(data.gameEvent[i].stepSetting.videoTutorialUrl, data.gameEvent[i].category)">视频教程</link-button></template>
               <task-list-item v-for="game in data.gameEvent[i].gameSetting" :key="game.uuid">
                 <template #title><span :class="{ 'disabled': game.complete_mission_try && game.complete_mission_A && game.complete_mission_B }">{{ game.gameName }}</span></template>
                 <template v-if="game.complete_mission_try && game.complete_mission_A && game.complete_mission_B" #opt>
@@ -69,6 +70,7 @@
         </step-list-item>
       </template>
     </step-list>
+    <video-floating-layer :show.sync="showVideo" :src="videoURL" @close="onVideoClose" />
   </div>
 </template>
 
@@ -87,6 +89,7 @@ import TaskListItem from '@/components/TaskListItem.vue';
 import SubtaskList from '@/components/SubtaskList.vue';
 import SubtaskListItem from '@/components/SubtaskListItem.vue';
 import LinkButton from '@/components/LinkButton.vue';
+import VideoFloatingLayer from '@/components/VideoFloatingLayer.vue';
 
 export default {
   components: {
@@ -104,11 +107,16 @@ export default {
     SubtaskList,
     SubtaskListItem,
     LinkButton,
+    VideoFloatingLayer,
   },
   data() {
     return {
       data: null,
       isLoading: false,
+      isRegistered: true,
+      showVideo: false,
+      videoURL: 'https://www.w3schools.com/html/mov_bbb.mp4',
+      videoCoin: 0,
     };
   },
   async created() {
@@ -117,6 +125,7 @@ export default {
   methods: {
     async getAllData() {
       const response = await this.$axios.get('/api/gameEvent/getRenderData');
+      // response.data.data.gameEvent[0].stepSetting.complete_mission_watchVideo = false;
       // response.data.data.gameEvent[0].stepSetting.status = '已完成';
       // response.data.data.gameEvent[1].stepSetting.status = '未开始';
       // response.data.data.gameEvent[1].stepSetting.expectEarning = 10000;
@@ -141,20 +150,22 @@ export default {
         await this.update();
       } catch (e) {
         if (e.response.data && e.response.data.message) {
-          alert(e.response.data.message);
+          console.log(e.response.data.message);
         } else {
-          alert('请求失败，服务器发生错误');
+          console.log('请求失败，服务器发生错误');
         }
       } finally {
         this.isLoading = false;
       }
     },
-    async openTask(stepText) {
+    async openTask(videoURL, stepText, coin) {
       if (this.isLoading) return;
       try {
         this.isLoading = true;
         await this.$axios.post('/api/gameEvent/initialGameEventByStep', { category: stepText });
         await this.update();
+        this.videoCoin = coin;
+        await this.showWatchVideo(videoURL, stepText);
       } catch (e) {
         if (e.response.data && e.response.data.message) {
           alert(e.response.data.message);
@@ -164,6 +175,18 @@ export default {
       } finally {
         this.isLoading = false;
       }
+    },
+    async showWatchVideo(url, step) {
+      this.videoURL = url;
+      this.showVideo = true;
+      if (step === 'STEP1') {
+        this.videoCoin = 0;
+      }
+      await this.completeVideo(step);
+    },
+    onVideoClose() {
+      if (this.videoCoin === 0) return;
+      alert(`视频教程观看完成，${this.videoCoin}金币奖励已到账`);
     },
     test($event) {
       console.log('test', $event);

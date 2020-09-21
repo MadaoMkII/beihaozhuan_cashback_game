@@ -1,11 +1,22 @@
 <template>
   <div class="activity-header">
     <div class="activity-header__progress">
-      <div class="activity-header__progress__progress-bar" style="width: 50%"></div>
+      <div class="activity-header__progress__progress-bar" :style="{ width: `${((value / 10000) / 500) * 100}%` }"></div>
     </div>
-    <div class="activity-header__cash">您本月共赚了：175.2元</div>
+    <div class="activity-header__cash">您本月共赚了：{{ value / 10000 }}元</div>
   </div>
 </template>
+
+<script>
+export default {
+  props: {
+    value: {
+      type: Number,
+      required: true,
+    },
+  },
+};
+</script>
 
 <style lang="scss" scoped>
 .activity-header {
