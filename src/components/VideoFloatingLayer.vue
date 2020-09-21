@@ -1,8 +1,6 @@
 <template>
   <div v-if="show" class="video-floating-layer">
-    <video controls>
-      <source :src="src" type="video/mp4">
-    </video>
+    <div class="video-floating-layer__video" v-html="src"></div>
     <div class="video-floating-layer__close" @click="onClose">
       <font-awesome-icon :icon="['far', 'times-circle']" />
     </div>
@@ -30,7 +28,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .video-floating-layer {
   z-index: 1000;
   position: fixed;
@@ -42,9 +40,30 @@ export default {
   align-items: center;
   justify-content: center;
   background-color: rgba(0, 0, 0, 0.8);
-  & > video {
+  &__video {
     width: 100%;
+    height: 100%;
+    //position: relative;
+    //display: flex;
+    //align-items: center;
+    //justify-content: center;
+    & > iframe {
+      width: 100%;
+      height: 100%;
+    }
+
+    //&::before {
+    //  content: '';
+    //  display: block;
+    //  width: 1px;
+    //  margin-left: -1px;
+    //  height: 0;
+    //}
   }
+
+  //&__video {
+  //  aspect-ratio: 1 / 1;
+  //}
 
   &__close {
     position: absolute;
