@@ -115,7 +115,7 @@ export default {
       isLoading: false,
       isRegistered: true,
       showVideo: false,
-      videoURL: 'https://www.w3schools.com/html/mov_bbb.mp4',
+      videoURL: '',
       videoCoin: 0,
       platform: this.getMobileOperatingSystem(),
     };
