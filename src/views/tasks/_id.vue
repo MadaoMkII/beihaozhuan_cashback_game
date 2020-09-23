@@ -124,17 +124,20 @@
         </div>
       </div>
     </div>
+    <i-o-s-extend/>
   </div>
 </template>
 
 <script>
 import BigGradientButton from '@/components/BigGradientButton.vue';
 import ScreenshotUpload from '@/components/ScreenshotUpload.vue';
+import IOSExtend from '@/components/IOSExtend.vue';
 
 export default {
   components: {
     BigGradientButton,
     ScreenshotUpload,
+    IOSExtend,
   },
   data() {
     return {

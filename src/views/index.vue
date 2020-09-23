@@ -16,7 +16,7 @@
         </template>
         <template v-if="data.gameEvent[0].stepSetting.status === '进行中'" #extend>
           <tutorial-list>
-            <tutorial-list-item value="0.2">
+            <tutorial-list-item :value="data.gameEvent[0].stepSetting.registerReward / 10000 + ''">
               <template #title>注册贝好赚用户送</template>
               <template v-if="!isRegistered" #opt><gradient-button>去完成</gradient-button></template>
               <template v-else #opt><outline-button disabled>已完成</outline-button></template>
@@ -71,6 +71,7 @@
       </template>
     </step-list>
     <video-floating-layer :show.sync="showVideo" :src="videoURL" @close="onVideoClose" />
+    <i-o-s-extend/>
   </div>
 </template>
 
@@ -90,6 +91,7 @@ import SubtaskList from '@/components/SubtaskList.vue';
 import SubtaskListItem from '@/components/SubtaskListItem.vue';
 import LinkButton from '@/components/LinkButton.vue';
 import VideoFloatingLayer from '@/components/VideoFloatingLayer.vue';
+import IOSExtend from '@/components/IOSExtend.vue';
 
 export default {
   components: {
@@ -108,6 +110,7 @@ export default {
     SubtaskListItem,
     LinkButton,
     VideoFloatingLayer,
+    IOSExtend,
   },
   data() {
     return {
