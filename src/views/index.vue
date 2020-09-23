@@ -18,7 +18,7 @@
           <tutorial-list>
             <tutorial-list-item :value="data.gameEvent[0].stepSetting.registerReward / 10000 + ''">
               <template #title>注册贝好赚用户送</template>
-              <template v-if="!isRegistered" #opt><gradient-button>去完成</gradient-button></template>
+              <template v-if="!isRegistered" #opt><gradient-button @click="goRegister">去完成</gradient-button></template>
               <template v-else #opt><outline-button disabled>已完成</outline-button></template>
             </tutorial-list-item>
             <tutorial-list-item :value="data.gameEvent[0].stepSetting.firstWatchEarning / 10000 + ''">
@@ -168,8 +168,13 @@ export default {
       console.log(this.data);
     },
     goWithdraw() {
-      console.log('go');
       window.open('/index/applyNew');
+    },
+    goRegister() {
+      const params = new URLSearchParams();
+      params.set('redirect', '/cashback-activity/');
+      params.set('action', 'cashback-game');
+      window.open(`/index/login?${params.toString()}`);
     },
     async completeVideo(stepText) {
       if (this.isLoading) return;
