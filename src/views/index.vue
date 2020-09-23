@@ -116,7 +116,7 @@ export default {
     return {
       data: null,
       isLoading: false,
-      isRegistered: !this.$route.query.unlogin,
+      isRegistered: !this.$route.query.noLogin,
       showVideo: false,
       videoStep: 'STEP1',
       videoURL: '',
