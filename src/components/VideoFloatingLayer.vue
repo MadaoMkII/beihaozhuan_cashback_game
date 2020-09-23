@@ -1,7 +1,7 @@
 <template>
   <div v-if="show" class="video-floating-layer">
     <div class="video-floating-layer__video" v-html="src"></div>
-    <div class="video-floating-layer__close" @click="onClose">
+    <div v-if="showClose" class="video-floating-layer__close" @click="onClose">
       <font-awesome-icon :icon="['far', 'times-circle']" />
     </div>
   </div>
@@ -18,6 +18,21 @@ export default {
       type: String,
       required: true,
     },
+  },
+  watch: {
+    show(value) {
+      if (value) {
+        this.showClose = false;
+        setTimeout(() => {
+          this.showClose = true;
+        }, 20 * 1000);
+      }
+    },
+  },
+  data() {
+    return {
+      showClose: false,
+    };
   },
   methods: {
     onClose() {
