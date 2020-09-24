@@ -128,11 +128,6 @@ export default {
     await this.update();
   },
   methods: {
-    isWechat() { // 判断是否是微信
-      const ua = navigator.userAgent.toLowerCase();
-      // eslint-disable-next-line eqeqeq
-      return ua.match(/MicroMessenger/i) == 'micromessenger';
-    },
     async getAllData() {
       const response = await this.$axios.get('/api/gameEvent/getRenderData');
       for (let i = 0; i < response.data.data.gameEvent.length; i += 1) {
@@ -175,15 +170,10 @@ export default {
       window.open('/index/applyNew');
     },
     goRegister() {
-      if (!this.isWechat()) {
-        const params = new URLSearchParams();
-        params.set('redirect', '/cashback-activity/');
-        params.set('action', 'cashback-game');
-        window.open(`/index/login?${params.toString()}`, '_self');
-      } else {
-        const url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx87462aaa978561bf&redirect_uri=https%3a%2f%2fwww.beihaozhuan.com/api/wechat/callback&response_type=code&scope=snsapi_userinfo&state=CHECK#wechat_redirect';
-        window.open(url, '_self');
-      }
+      const params = new URLSearchParams();
+      params.set('redirect', '/cashback-activity/');
+      params.set('action', 'cashback-game');
+      window.open(`/index/login?${params.toString()}`, '_self');
     },
     async completeVideo(stepText) {
       if (this.isLoading) return;
