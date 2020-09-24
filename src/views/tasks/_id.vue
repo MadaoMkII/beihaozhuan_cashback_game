@@ -18,13 +18,13 @@
           <big-gradient-button @click="download(task.downloadUrl)">下载“{{ task.gameName }}”</big-gradient-button>
         </div>
       </div>
-      <div class="card">
+      <div class="card" :class="{ 'card--disabled': !task.hasDownloaded }">
         <div class="card__title">上传试玩截图</div>
         <div class="card__description">{{ task.demoDescription }}</div>
         <div class="screenshot-upload">
           <div class="screenshot-upload__item">
             <div class="screenshot-upload__item__title">示例图</div>
-            <div class="screenshot-upload__item__screenshot"><img :src="task.demoSketchUrl" alt="示例图"></div>
+            <div class="screenshot-upload__item__screenshot"><img :src="task.demoSketchUrl" alt="示例图" @click="showPreview(task.demoSketchUrl)"></div>
           </div>
           <div class="screenshot-upload__item">
             <div class="screenshot-upload__item__title">我的截图</div>
@@ -59,7 +59,7 @@
         <div class="screenshot-upload">
           <div class="screenshot-upload__item">
             <div class="screenshot-upload__item__title">示例图</div>
-            <div class="screenshot-upload__item__screenshot"><img :src="task.subsequent_A.subsequentSketchUrl" alt="示例图"></div>
+            <div class="screenshot-upload__item__screenshot"><img :src="task.subsequent_A.subsequentSketchUrl" alt="示例图" @click="showPreview(task.subsequent_A.subsequentSketchUrl)"></div>
           </div>
           <div class="screenshot-upload__item">
             <div class="screenshot-upload__item__title">我的截图</div>
@@ -94,7 +94,7 @@
         <div class="screenshot-upload">
           <div class="screenshot-upload__item">
             <div class="screenshot-upload__item__title">示例图</div>
-            <div class="screenshot-upload__item__screenshot"><img :src="task.subsequent_B.subsequentSketchUrl" alt="示例图"></div>
+            <div class="screenshot-upload__item__screenshot"><img :src="task.subsequent_B.subsequentSketchUrl" alt="示例图" @click="showPreview(task.subsequent_B.subsequentSketchUrl)"></div>
           </div>
           <div class="screenshot-upload__item">
             <div class="screenshot-upload__item__title">我的截图</div>
@@ -124,6 +124,9 @@
         </div>
       </div>
     </div>
+    <div v-if="previewImage !== null" class="preview" @click="closePreview">
+      <img :src="previewImage">
+    </div>
     <i-o-s-extend/>
   </div>
 </template>
@@ -146,12 +149,19 @@ export default {
       screenshot: '',
       screenshotA: '',
       screenshotB: '',
+      previewImage: null,
     };
   },
   async created() {
     await this.update();
   },
   methods: {
+    showPreview(image) {
+      this.previewImage = image;
+    },
+    closePreview() {
+      this.previewImage = null;
+    },
     async update() {
       this.task = await this.getGame();
       switch (this.task.status_mission_try) {
@@ -204,7 +214,26 @@ export default {
       const response = await this.$axios.post('/api/gameEvent/getGameProcessByUUid', { uuid: this.$route.params.id, category: this.$route.query.stepText });
       return response.data.data;
     },
-    download(url) {
+    async download(url) {
+      if (!this.task.hasDownloaded) {
+        if (this.isLoading) return;
+        try {
+          this.isLoading = true;
+          await this.$axios.post('/api/gameEvent/completeDownload', {
+            uuid: this.$route.params.id,
+            category: this.$route.query.stepText,
+          });
+          await this.update();
+        } catch (e) {
+          if (e.response.data && e.response.data.message) {
+            alert(e.response.data.message);
+          } else {
+            alert('请求失败，服务器发生错误');
+          }
+        } finally {
+          this.isLoading = false;
+        }
+      }
       window.open(url);
     },
     async submit(type, screenshotURL) {
@@ -237,6 +266,24 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.preview {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  & > img {
+    max-width: 80%;
+    max-height: 80%;
+  }
+}
+
 .task-sticky-top {
   position: sticky;
   top: 0;
