@@ -60,9 +60,9 @@
                 </template>
                 <subtask-list :disabled="game.complete_mission_try && game.complete_mission_A && game.complete_mission_B">
                   <template #banner><img :class="{ 'disabled': game.complete_mission_try && game.complete_mission_A && game.complete_mission_B }" :src="game.gameBannerUrl" :alt="game.gameName"></template>
-                  <subtask-list-item :value="game.demoReward / 10000 + ''" :disabled="game.complete_mission_try">试玩奖励</subtask-list-item>
-                  <subtask-list-item v-if="game.subsequent_A.available" :value="game.subsequent_A.subsequentReward / 10000 + ''" :disabled="game.complete_mission_A">后续任务A</subtask-list-item>
-                  <subtask-list-item v-if="game.subsequent_B.available" :value="game.subsequent_B.subsequentReward / 10000 + ''" :disabled="game.complete_mission_B">后续任务B</subtask-list-item>
+                  <subtask-list-item :value="game.demoReward / 10000 + ''" :disabled="game.complete_mission_try" @click.native="goTask(game, i)">试玩奖励</subtask-list-item>
+                  <subtask-list-item v-if="game.subsequent_A.available" :value="game.subsequent_A.subsequentReward / 10000 + ''" :disabled="game.complete_mission_A" @click.native="goTask(game, i)">后续任务A</subtask-list-item>
+                  <subtask-list-item v-if="game.subsequent_B.available" :value="game.subsequent_B.subsequentReward / 10000 + ''" :disabled="game.complete_mission_B" @click.native="goTask(game, i)">后续任务B</subtask-list-item>
                 </subtask-list>
               </task-list-item>
             </task-list>
@@ -72,6 +72,7 @@
     </step-list>
     <video-floating-layer :show.sync="showVideo" :src="videoURL" @close="onVideoClose" />
     <i-o-s-extend/>
+    <tabbar v-if="isRegistered"/>
   </div>
 </template>
 
@@ -92,6 +93,7 @@ import SubtaskListItem from '@/components/SubtaskListItem.vue';
 import LinkButton from '@/components/LinkButton.vue';
 import VideoFloatingLayer from '@/components/VideoFloatingLayer.vue';
 import IOSExtend from '@/components/IOSExtend.vue';
+import Tabbar from '@/components/Tabbar.vue';
 
 export default {
   components: {
@@ -111,6 +113,7 @@ export default {
     LinkButton,
     VideoFloatingLayer,
     IOSExtend,
+    Tabbar,
   },
   data() {
     return {
@@ -233,6 +236,10 @@ export default {
       }
 
       return '通用';
+    },
+    goTask(game, i) {
+      if (game.complete_mission_try && game.complete_mission_A && game.complete_mission_B) return;
+      this.$router.push({ name: 'TasksID', params: { id: game.uuid }, query: { stepText: this.data.gameEvent[i].category } });
     },
     test($event) {
       console.log('test', $event);
