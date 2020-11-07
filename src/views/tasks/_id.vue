@@ -163,7 +163,12 @@ export default {
       this.previewImage = null;
     },
     async update() {
-      this.task = await this.getGame();
+      const data = await this.getGame();
+      if (data.done) {
+        this.$router.push({ name: 'Index' });
+        return;
+      }
+      this.task = data;
       switch (this.task.status_mission_try) {
         case '未提交':
           this.screenshot = '';
