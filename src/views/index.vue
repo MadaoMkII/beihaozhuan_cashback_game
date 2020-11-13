@@ -80,11 +80,13 @@
     <div v-if="showQRCode" class="qrcode" @click="showQRCode = false">
       <div class="qrcode__window">
         <img src="@/assets/qrcode.jpg" alt="扫码关注贝好赚">
-        <div class="qrcode__window__tip">长按图片进入贝好赚公众号</div>
-        <div class="qrcode__window__title">关注公众号您可享受一下重要权益：</div>
+        <div class="qrcode__window__tip">长按关注贝好赚公众号升级权益</div>
+        <div class="qrcode__window__title">关注公众号您可享受以下重要权益：</div>
         <ul class="qrcode__window__dt">
           <li>1.每日每月额外英雄榜收益</li>
           <li>2.活动审批即时结果推送</li>
+          <li>3.人工客服</li>
+          <li>4.最新活动咨询等</li>
         </ul>
       </div>
     </div>
