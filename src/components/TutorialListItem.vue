@@ -4,7 +4,7 @@
       <div class="tutorial-list-item__left__title">
         <slot v-if="$slots.title" name="title"></slot>
       </div>
-      <div class="tutorial-list-item__left__subtitle">
+      <div v-if="value" class="tutorial-list-item__left__subtitle">
         <div class="tutorial-list-item__left__subtitle__coin"/>
         +{{ value }}元
       </div>

@@ -21,6 +21,10 @@
               <template v-if="!isRegistered" #opt><gradient-button @click="goRegister">去完成</gradient-button></template>
               <template v-else #opt><outline-button disabled>已完成</outline-button></template>
             </tutorial-list-item>
+            <tutorial-list-item :value="''">
+              <template #title>扫码关注贝好赚</template>
+              <template #opt><gradient-button @click="openQRCode">去关注</gradient-button></template>
+            </tutorial-list-item>
             <tutorial-list-item :value="data.gameEvent[0].stepSetting.firstWatchEarning / 10000 + ''">
               <template #title>阅读新手教程视频</template>
               <template v-if="!data.gameEvent[0].stepSetting.complete_mission_watchVideo" #opt><gradient-button @click="showWatchVideo('STEP1', data.gameEvent[0].stepSetting.firstWatchEarning, data.gameEvent[0].stepSetting.videoTutorialUrl)" :disabled="!isRegistered">去完成</gradient-button></template>
@@ -73,6 +77,17 @@
     <video-floating-layer :show.sync="showVideo" :src="videoURL" @close="onVideoClose" />
     <i-o-s-extend/>
     <tabbar v-if="isRegistered"/>
+    <div v-if="showQRCode" class="qrcode" @click="showQRCode = false">
+      <div class="qrcode__window">
+        <img src="@/assets/qrcode.jpg" alt="扫码关注贝好赚">
+        <div class="qrcode__window__tip">长按图片进入贝好赚公众号</div>
+        <div class="qrcode__window__title">关注公众号您可享受一下重要权益：</div>
+        <ul class="qrcode__window__dt">
+          <li>1.每日每月额外英雄榜收益</li>
+          <li>2.活动审批即时结果推送</li>
+        </ul>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -125,12 +140,16 @@ export default {
       videoURL: '',
       videoCoin: 0,
       platform: this.getMobileOperatingSystem(),
+      showQRCode: false,
     };
   },
   async created() {
     await this.update();
   },
   methods: {
+    openQRCode() {
+      this.showQRCode = true;
+    },
     async getAllData() {
       const response = await this.$axios.get('/api/gameEvent/getRenderData');
       for (let i = 0; i < response.data.data.gameEvent.length; i += 1) {
@@ -256,5 +275,55 @@ export default {
 
 .disabled {
   opacity: 0.5;
+}
+
+.qrcode {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &__window {
+    width: 80%;
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+
+    & > img {
+      display: block;
+      width: 100%;
+    }
+
+    &__tip {
+      font-size: 28px;
+      color: #aaa;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    &__title {
+      font-size: 30px;
+      color: #333;
+      margin-bottom: 30px;
+      padding: 0 30px;
+    }
+
+    &__dt {
+      font-size: 30px;
+      color: #333;
+      margin-bottom: 30px;
+      padding: 0 30px;
+      list-style: none;
+      & > li {
+        color: #666;
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+    }
+  }
 }
 </style>
