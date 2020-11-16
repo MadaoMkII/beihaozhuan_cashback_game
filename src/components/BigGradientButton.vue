@@ -28,7 +28,7 @@ export default {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 426px;
+  min-width: 426px;
   height: 80px;
   background: linear-gradient(270deg, #F0DCB6 0%, #DDB67F 100%);
   box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.2);
@@ -38,6 +38,9 @@ export default {
   font-weight: 600;
   color: #FFFFFF;
   line-height: 40px;
+  padding-left: 30px;
+  padding-right: 30px;
+  box-sizing: border-box;
 
   &--disabled {
     opacity: 0.5;

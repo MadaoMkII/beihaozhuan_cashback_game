@@ -4,7 +4,7 @@
 
 <style lang="scss" scoped>
 .ios-extend {
-  padding-top: 6vw;
+  padding-top: 100px;
   padding-bottom: constant(safe-area-inset-bottom);
   padding-bottom: env(safe-area-inset-bottom);
 }

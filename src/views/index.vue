@@ -21,6 +21,10 @@
               <template v-if="!isRegistered" #opt><gradient-button @click="goRegister">去完成</gradient-button></template>
               <template v-else #opt><outline-button disabled>已完成</outline-button></template>
             </tutorial-list-item>
+            <tutorial-list-item :value="''">
+              <template #title>扫码关注贝好赚</template>
+              <template #opt><gradient-button @click="openQRCode">去关注</gradient-button></template>
+            </tutorial-list-item>
             <tutorial-list-item :value="data.gameEvent[0].stepSetting.firstWatchEarning / 10000 + ''">
               <template #title>阅读新手教程视频</template>
               <template v-if="!data.gameEvent[0].stepSetting.complete_mission_watchVideo" #opt><gradient-button @click="showWatchVideo('STEP1', data.gameEvent[0].stepSetting.firstWatchEarning, data.gameEvent[0].stepSetting.videoTutorialUrl)" :disabled="!isRegistered">去完成</gradient-button></template>
@@ -51,8 +55,8 @@
             <task-list>
               <template v-if="data.gameEvent[i].stepSetting.videoTutorialUrl !== ''" #opt><link-button @click="showWatchVideo(data.gameEvent[i].category, 0, data.gameEvent[i].stepSetting.videoTutorialUrl)">视频教程</link-button></template>
               <task-list-item v-for="game in data.gameEvent[i].gameSetting" :key="game.uuid">
-                <template #title><span :class="{ 'disabled': game.complete_mission_try && game.complete_mission_A && game.complete_mission_B }">{{ game.gameName }}</span></template>
-                <template v-if="game.complete_mission_try && game.complete_mission_A && game.complete_mission_B" #opt>
+                <template #title><span :class="{ 'disabled': game.done }">{{ game.gameName }}</span></template>
+                <template v-if="game.done" #opt>
                   <outline-button disabled>已完成</outline-button>
                 </template>
                 <template v-else #opt>
@@ -60,9 +64,9 @@
                 </template>
                 <subtask-list :disabled="game.complete_mission_try && game.complete_mission_A && game.complete_mission_B">
                   <template #banner><img :class="{ 'disabled': game.complete_mission_try && game.complete_mission_A && game.complete_mission_B }" :src="game.gameBannerUrl" :alt="game.gameName"></template>
-                  <subtask-list-item :value="game.demoReward / 10000 + ''" :disabled="game.complete_mission_try">试玩奖励</subtask-list-item>
-                  <subtask-list-item v-if="game.subsequent_A.available" :value="game.subsequent_A.subsequentReward / 10000 + ''" :disabled="game.complete_mission_A">后续任务A</subtask-list-item>
-                  <subtask-list-item v-if="game.subsequent_B.available" :value="game.subsequent_B.subsequentReward / 10000 + ''" :disabled="game.complete_mission_B">后续任务B</subtask-list-item>
+                  <subtask-list-item :value="game.demoReward / 10000 + ''" :disabled="game.complete_mission_try" @click.native="goTask(game, i)">试玩奖励</subtask-list-item>
+                  <subtask-list-item v-if="game.subsequent_A.available" :value="game.subsequent_A.subsequentReward / 10000 + ''" :disabled="game.complete_mission_A" @click.native="goTask(game, i)">后续任务A</subtask-list-item>
+                  <subtask-list-item v-if="game.subsequent_B.available" :value="game.subsequent_B.subsequentReward / 10000 + ''" :disabled="game.complete_mission_B" @click.native="goTask(game, i)">后续任务B</subtask-list-item>
                 </subtask-list>
               </task-list-item>
             </task-list>
@@ -72,6 +76,20 @@
     </step-list>
     <video-floating-layer :show.sync="showVideo" :src="videoURL" @close="onVideoClose" />
     <i-o-s-extend/>
+    <tabbar v-if="isRegistered"/>
+    <div v-if="showQRCode" class="qrcode" @click="showQRCode = false">
+      <div class="qrcode__window">
+        <img src="@/assets/qrcode.jpg" alt="扫码关注贝好赚">
+        <div class="qrcode__window__tip">长按关注贝好赚公众号升级权益</div>
+        <div class="qrcode__window__title">关注公众号您可享受以下重要权益：</div>
+        <ul class="qrcode__window__dt">
+          <li>1.每日每月额外英雄榜收益</li>
+          <li>2.活动审批即时结果推送</li>
+          <li>3.人工客服</li>
+          <li>4.最新活动咨询等</li>
+        </ul>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -92,6 +110,7 @@ import SubtaskListItem from '@/components/SubtaskListItem.vue';
 import LinkButton from '@/components/LinkButton.vue';
 import VideoFloatingLayer from '@/components/VideoFloatingLayer.vue';
 import IOSExtend from '@/components/IOSExtend.vue';
+import Tabbar from '@/components/Tabbar.vue';
 
 export default {
   components: {
@@ -111,6 +130,7 @@ export default {
     LinkButton,
     VideoFloatingLayer,
     IOSExtend,
+    Tabbar,
   },
   data() {
     return {
@@ -122,12 +142,16 @@ export default {
       videoURL: '',
       videoCoin: 0,
       platform: this.getMobileOperatingSystem(),
+      showQRCode: false,
     };
   },
   async created() {
     await this.update();
   },
   methods: {
+    openQRCode() {
+      this.showQRCode = true;
+    },
     async getAllData() {
       const response = await this.$axios.get('/api/gameEvent/getRenderData');
       for (let i = 0; i < response.data.data.gameEvent.length; i += 1) {
@@ -234,6 +258,10 @@ export default {
 
       return '通用';
     },
+    goTask(game, i) {
+      if (game.done) return;
+      this.$router.push({ name: 'TasksID', params: { id: game.uuid }, query: { stepText: this.data.gameEvent[i].category } });
+    },
     test($event) {
       console.log('test', $event);
     },
@@ -249,5 +277,55 @@ export default {
 
 .disabled {
   opacity: 0.5;
+}
+
+.qrcode {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &__window {
+    width: 80%;
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+
+    & > img {
+      display: block;
+      width: 100%;
+    }
+
+    &__tip {
+      font-size: 28px;
+      color: #aaa;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    &__title {
+      font-size: 30px;
+      color: #333;
+      margin-bottom: 30px;
+      padding: 0 30px;
+    }
+
+    &__dt {
+      font-size: 30px;
+      color: #333;
+      margin-bottom: 30px;
+      padding: 0 30px;
+      list-style: none;
+      & > li {
+        color: #666;
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+    }
+  }
 }
 </style>
