@@ -13,8 +13,8 @@
   background-color: #15161D;
   position: fixed;
   bottom: 0;
-  margin-bottom: constant(safe-area-inset-bottom);
-  margin-bottom: env(safe-area-inset-bottom);
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
   left: 0;
   right: 0;
   display: flex;
