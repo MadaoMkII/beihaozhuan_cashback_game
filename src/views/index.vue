@@ -55,8 +55,8 @@
             <task-list>
               <template v-if="data.gameEvent[i].stepSetting.videoTutorialUrl !== ''" #opt><link-button @click="showWatchVideo(data.gameEvent[i].category, 0, data.gameEvent[i].stepSetting.videoTutorialUrl)">视频教程</link-button></template>
               <task-list-item v-for="game in data.gameEvent[i].gameSetting" :key="game.uuid">
-                <template #title><span :class="{ 'disabled': game.complete_mission_try && game.complete_mission_A && game.complete_mission_B }">{{ game.gameName }}</span></template>
-                <template v-if="game.complete_mission_try && game.complete_mission_A && game.complete_mission_B" #opt>
+                <template #title><span :class="{ 'disabled': game.done }">{{ game.gameName }}</span></template>
+                <template v-if="game.done" #opt>
                   <outline-button disabled>已完成</outline-button>
                 </template>
                 <template v-else #opt>
@@ -259,7 +259,7 @@ export default {
       return '通用';
     },
     goTask(game, i) {
-      if (game.complete_mission_try && game.complete_mission_A && game.complete_mission_B) return;
+      if (game.done) return;
       this.$router.push({ name: 'TasksID', params: { id: game.uuid }, query: { stepText: this.data.gameEvent[i].category } });
     },
     test($event) {

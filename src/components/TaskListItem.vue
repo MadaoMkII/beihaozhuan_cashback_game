@@ -18,14 +18,17 @@
     &__l {
       display: flex;
       align-items: center;
-      height: 48px;
+      //height: 48px;
       font-size: 30px;
       font-family: PingFangSC-Regular, PingFang SC;
       font-weight: 400;
       color: #FFFFFF;
       line-height: 40px;
+      //margin-right: 15px;
     }
-    &__r {}
+    &__r {
+      flex-shrink: 0;
+    }
   }
 }
 </style>

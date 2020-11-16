@@ -5,7 +5,7 @@
         <div class="task__navbar__back" @click="$router.back()">
           <font-awesome-icon icon="chevron-left" />
         </div>
-        贝好赚 - {{ task.gameName }}
+        <div class="task__navbar__text">贝好赚 - {{ task.gameName }}</div>
       </div>
     </div>
     <div class="task__header"><img :src="task.gameBannerUrl" :alt="task.gameName"></div>
@@ -165,6 +165,7 @@ export default {
     async update() {
       const data = await this.getGame();
       if (data.done) {
+        alert('此任务已完成，现在跳转至首页');
         this.$router.push({ name: 'Index' });
         return;
       }
@@ -307,6 +308,9 @@ export default {
     background-color: #313340;
     text-align: center;
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     &__back {
       padding: 20px 24px;
@@ -317,6 +321,13 @@ export default {
       color: #fff;
       display: flex;
       align-items: center;
+    }
+
+    &__text {
+      max-width: 600px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
   &__header {
