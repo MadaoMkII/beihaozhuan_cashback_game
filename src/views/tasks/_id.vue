@@ -240,6 +240,23 @@ export default {
           this.isLoading = false;
         }
       }
+
+      if (this.isLoading) return;
+      try {
+        this.isLoading = true;
+        await this.$axios.post('/api/gameEvent/recordDownload', {
+          gameUUid: this.$route.params.id,
+          name: this.task.gameName,
+        });
+      } catch (e) {
+        if (e.response.data && e.response.data.message) {
+          alert(e.response.data.message);
+        } else {
+          alert('请求失败，服务器发生错误');
+        }
+      } finally {
+        this.isLoading = false;
+      }
       window.open(url);
     },
     async submit(type, screenshotURL) {
