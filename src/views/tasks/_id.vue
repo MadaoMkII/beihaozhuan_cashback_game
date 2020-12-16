@@ -221,6 +221,7 @@ export default {
       return response.data.data;
     },
     async download(url) {
+      window.open(url);
       if (!this.task.hasDownloaded) {
         if (this.isLoading) return;
         try {
@@ -257,7 +258,6 @@ export default {
       } finally {
         this.isLoading = false;
       }
-      window.open(url);
     },
     async submit(type, screenshotURL) {
       if (screenshotURL === '') {
