@@ -55,18 +55,18 @@
             <task-list>
               <template v-if="data.gameEvent[i].stepSetting.videoTutorialUrl !== ''" #opt><link-button @click="showWatchVideo(data.gameEvent[i].category, 0, data.gameEvent[i].stepSetting.videoTutorialUrl)">视频教程</link-button></template>
               <task-list-item v-for="game in data.gameEvent[i].gameSetting" :key="game.uuid">
-                <template #title><span :class="{ 'disabled': game.done || data.gameEvent[i].stepSetting.status === '已完成' }">{{ game.gameName }}</span></template>
-                <template v-if="game.done || data.gameEvent[i].stepSetting.status === '已完成'" #opt>
+                <template #title><span :class="{ 'disabled': game.done }">{{ game.gameName }}</span></template>
+                <template v-if="game.done" #opt>
                   <outline-button disabled>已完成</outline-button>
                 </template>
                 <template v-else #opt>
                   <gradient-button @click="$router.push({ name: 'TasksID', params: { id: game.uuid }, query: { stepText: data.gameEvent[i].category } })">去完成</gradient-button>
                 </template>
-                <subtask-list :disabled="(game.complete_mission_try && game.complete_mission_A && game.complete_mission_B) || data.gameEvent[i].stepSetting.status === '已完成'">
-                  <template #banner><img :class="{ 'disabled': (game.complete_mission_try && game.complete_mission_A && game.complete_mission_B) || data.gameEvent[i].stepSetting.status === '已完成' }" :src="game.gameBannerUrl" :alt="game.gameName"></template>
-                  <subtask-list-item :value="game.demoReward / 10000 + ''" :disabled="game.complete_mission_try || data.gameEvent[i].stepSetting.status === '已完成'" @click.native="goTask(game, i)">试玩奖励</subtask-list-item>
-                  <subtask-list-item v-if="game.subsequent_A.available" :value="game.subsequent_A.subsequentReward / 10000 + ''" :disabled="game.complete_mission_A || data.gameEvent[i].stepSetting.status === '已完成'" @click.native="goTask(game, i)">后续任务A</subtask-list-item>
-                  <subtask-list-item v-if="game.subsequent_B.available" :value="game.subsequent_B.subsequentReward / 10000 + ''" :disabled="game.complete_mission_B || data.gameEvent[i].stepSetting.status === '已完成'" @click.native="goTask(game, i)">后续任务B</subtask-list-item>
+                <subtask-list :disabled="(game.complete_mission_try && game.complete_mission_A && game.complete_mission_B)">
+                  <template #banner><img :class="{ 'disabled': (game.complete_mission_try && game.complete_mission_A && game.complete_mission_B) }" :src="game.gameBannerUrl" :alt="game.gameName"></template>
+                  <subtask-list-item :value="game.demoReward / 10000 + ''" :disabled="game.complete_mission_try" @click.native="goTask(game, i)">试玩奖励</subtask-list-item>
+                  <subtask-list-item v-if="game.subsequent_A.available" :value="game.subsequent_A.subsequentReward / 10000 + ''" :disabled="game.complete_mission_A" @click.native="goTask(game, i)">后续任务A</subtask-list-item>
+                  <subtask-list-item v-if="game.subsequent_B.available" :value="game.subsequent_B.subsequentReward / 10000 + ''" :disabled="game.complete_mission_B" @click.native="goTask(game, i)">后续任务B</subtask-list-item>
                 </subtask-list>
               </task-list-item>
             </task-list>
@@ -259,7 +259,6 @@ export default {
       return '通用';
     },
     goTask(game, i) {
-      if (this.data.gameEvent[i].stepSetting.status === '已完成') return;
       if (game.done) return;
       this.$router.push({ name: 'TasksID', params: { id: game.uuid }, query: { stepText: this.data.gameEvent[i].category } });
     },
