@@ -39,6 +39,7 @@ export default {
   padding: 0 24px;
   align-items: center;
   justify-content: center;
+  white-space: nowrap;
 
   &--disabled {
     opacity: 0.5;
