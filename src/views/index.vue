@@ -25,20 +25,20 @@
 <!--              <template #title>扫码关注贝好赚</template>-->
 <!--              <template #opt><gradient-button @click="openQRCode">去关注</gradient-button></template>-->
 <!--            </tutorial-list-item>-->
-            <tutorial-list-item :value="''">
-              <template #title>您对贝好赚了解多少</template>
-              <template #opt><gradient-button @click="openQuestion">去回答</gradient-button></template>
-            </tutorial-list-item>
-            <tutorial-list-item :value="data.gameEvent[0].stepSetting.firstWatchEarning / 10000 + ''">
-              <template #title>阅读新手教程视频</template>
-              <template v-if="!data.gameEvent[0].stepSetting.complete_mission_watchVideo" #opt><gradient-button @click="showWatchVideo('STEP1', data.gameEvent[0].stepSetting.firstWatchEarning, data.gameEvent[0].stepSetting.videoTutorialUrl)" :disabled="!isRegistered">去完成</gradient-button></template>
-              <template v-else #opt><outline-button disabled>已完成</outline-button></template>
-            </tutorial-list-item>
-<!--            <tutorial-list-item :value="data.gameEvent[0].gameSetting[0].demoReward / 10000 + ''">-->
-<!--              <template #title>您在贝好赚的第一个任务</template>-->
-<!--              <template v-if="!data.gameEvent[0].gameSetting[0].complete_mission_try" #opt><gradient-button @click="$router.push({ name: 'TasksID', params: { id: data.gameEvent[0].gameSetting[0].uuid }, query: { stepText: data.gameEvent[0].category } })" :disabled="!isRegistered">去完成</gradient-button></template>-->
+<!--            <tutorial-list-item :value="''">-->
+<!--              <template #title>您对贝好赚了解多少</template>-->
+<!--              <template #opt><gradient-button @click="openQuestion">去回答</gradient-button></template>-->
+<!--            </tutorial-list-item>-->
+<!--            <tutorial-list-item :value="data.gameEvent[0].stepSetting.firstWatchEarning / 10000 + ''">-->
+<!--              <template #title>阅读新手教程视频</template>-->
+<!--              <template v-if="!data.gameEvent[0].stepSetting.complete_mission_watchVideo" #opt><gradient-button @click="showWatchVideo('STEP1', data.gameEvent[0].stepSetting.firstWatchEarning, data.gameEvent[0].stepSetting.videoTutorialUrl)" :disabled="!isRegistered">去完成</gradient-button></template>-->
 <!--              <template v-else #opt><outline-button disabled>已完成</outline-button></template>-->
 <!--            </tutorial-list-item>-->
+            <tutorial-list-item :value="data.gameEvent[0].gameSetting[0].demoReward / 10000 + ''">
+              <template #title>您在贝好赚的第一个任务</template>
+              <template v-if="!data.gameEvent[0].gameSetting[0].complete_mission_try" #opt><gradient-button @click="$router.push({ name: 'TasksID', params: { id: data.gameEvent[0].gameSetting[0].uuid }, query: { stepText: data.gameEvent[0].category } })" :disabled="!isRegistered">去完成</gradient-button></template>
+              <template v-else #opt><outline-button disabled>已完成</outline-button></template>
+            </tutorial-list-item>
           </tutorial-list>
         </template>
       </step-list-item>
